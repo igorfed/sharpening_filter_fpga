@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 `define clk_period 10
 `define soursed_image_name  "test/source_rgb_512.bmp"
-`define processed_image_name  "image/sharpened_fpga_rgb_512.bmp"
+`define processed_image_name  "test/sharpened_fpga_rgb_512.bmp"
 
 
 
