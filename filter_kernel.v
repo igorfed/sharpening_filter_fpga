@@ -45,7 +45,7 @@ wire filter_data_buffer_done;
 filter_data_buffer #(
     .WIDTH(WIDTH),
     .DEPTH(DEPTH),
-    .LINE_BITS(10),
+    .LINE_BITS(LINE_BITS),
     .ROWS(ROWS),
     .COLS(COLS)
 )

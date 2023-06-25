@@ -1,5 +1,5 @@
 file mkdir out
-
+file mkdir work
 vlib work
 
 vlog filter_mod.v

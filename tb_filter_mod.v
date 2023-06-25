@@ -19,19 +19,18 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 `define clk_period 10
-`define soursed_image_name  "test/source_rgb_512.bmp"
-`define processed_image_name  "test/sharpened_fpga_rgb_512.bmp"
-
-
+`define soursed_image_name  "3840/source_rgb_3840_2160.bmp"
+`define processed_image_name  "3840/sharpened_fpga_rgb_3840_2160.bmp"
+`define processed_image_hex  "3840/sharpened_fpga_rgb_3840_2160.txt"
 
 
 
 module tb_filter_mod #(
     parameter WIDTH = 8, 
-    parameter DEPTH = 512, //3840
-    parameter LINE_BITS = 10, //12
-    parameter ROWS = 512, //3840
-    parameter COLS = 512 // 2160
+    parameter DEPTH = 3840,
+    parameter LINE_BITS = 14, //12
+    parameter ROWS =3840, //3840
+    parameter COLS = 2160 // 2160
 
     )
     
@@ -53,9 +52,9 @@ wire [WIDTH-1:0] g_data_out;
 wire [WIDTH-1:0] b_data_out;
 wire data_out_done; // __________________________|clk|____________________ data is finished
 
-localparam RESULT_DATA_ARRAY_LENGTH = 1024*1024; // 500kByte
+localparam RESULT_DATA_ARRAY_LENGTH = ROWS*COLS*3; // 500kByte
 reg [WIDTH-1:0] result [0: RESULT_DATA_ARRAY_LENGTH-1];
-localparam BMP_DATA_ARRAY_LENGTH = 1024*1024; // 500kByte
+localparam BMP_DATA_ARRAY_LENGTH = ROWS*COLS*3; // 500kByte
 reg [WIDTH-1:0] bmp_data [0: BMP_DATA_ARRAY_LENGTH-1];
 
 // Save BMP file size 
@@ -77,6 +76,11 @@ always #(`clk_period/2) clk =~clk;
 initial 
 begin : reset_signal
     integer i;
+integer k;
+	//for (k=0;k<ROWS*COLS*3; k=k+1)
+	//begin
+	//	result[k] = 0;
+	//end 
 	reset = 1'b1;
 	r_data_in = 8'd0;
 	g_data_in = 8'd0;
@@ -114,6 +118,7 @@ begin : reset_signal
 	@(posedge clk);
 	@(posedge clk);
     
+   write_hex_after_processings;
    write_bmp_after_processings;
     
     @(posedge clk);
@@ -170,6 +175,7 @@ task write_bmp_after_processings;
         end 
         for(i=bmp_start_pos;i<bmp_size;i=i+1)
         begin 
+	//if (result[i]==8'hxx)
             $fwrite(file_id, "%c", result[i-bmp_start_pos]);
         end 
         $fclose(file_id);
@@ -178,19 +184,45 @@ task write_bmp_after_processings;
 endtask     
     
 /////////////////Write BMP TASK//////////////////////////////////////
+task write_hex_after_processings;
+    integer file_id;
+    integer i; 
+    integer k;	
+    begin
+        file_id = $fopen(`processed_image_hex, "w");
+//bmp_size-bmp_start_pos
+        for(i=0;i<ROWS*COLS*3 ;i=i+1)
+        begin 
+		$fwrite(file_id, "%d,", result[i]);
+	
+//	if (i%ROWS) begin
+//        	$display("i = %d\n", i);
+//	end
+        end 
+
+
+        
+        $fclose(file_id);
+        $display("Write hex done");
+    end 
+endtask  
 
 integer i, j;
+
 always @(posedge clk) begin
     if (reset) begin
         j <=8'd0;
-    end else begin
+     end else begin
         if (data_out_done) begin
+
             result[j] <= r_data_out;  
+
             result[j+1] <= g_data_out;
             result[j+2] <= b_data_out;
             j <= j+3;
         end 
     end  
+
 end 
 
 
