@@ -25,3 +25,30 @@ Soursed Image
 Processed Image using FPGA
 
 <img src="test/sharpened_fpga_rgb_512.bmp" width="900">
+
+
+# To change Resolution
+
+go to tb_filter_mod.v
+
+change 
+
+    `define soursed_image_name  "..."
+    `define processed_image_name  "..."
+    `define processed_image_hex  "..."
+
+    ...
+    parameter WIDTH = 8, 
+    parameter DEPTH = 3840,
+    parameter LINE_BITS = 14
+    parameter ROWS =3840, 
+    parameter COLS = 2160 
+
+Soursed Image
+<img src="3840_2160/source_rgb_3840_2160.bmp" width="900">
+
+Processed Image using FPGA
+
+<img src="3840_2160/sharpened_fpga_rgb_3840_2160.bmp" width="900">
+
+
